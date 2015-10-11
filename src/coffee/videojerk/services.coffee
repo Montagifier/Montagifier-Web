@@ -3,10 +3,25 @@
 define ['jquery', 'angular'], ($, angular) ->
     angular.module 'VideoJerk.Services', []
     .constant 'SERVICECONFIG',
-        'BASEAPIURL': 'http://localhost:8000/api'
+        'BASEAPIURL': 'http://montagifier.henryz.me/'
+        'BASEVIDEOURL': 'http://localhost:8000/api'
         'BASEAUDIOURL': 'http://localhost:8000/audio'
     .factory 'WebSocketConnectionService', [() ->
         handlers = {}
+
+        ws = null
+
+        connect = () ->
+            ws = new WebSocket('ws://montagifierws.henryz.me')
+            ws.onmessage = (e) ->
+                console.log e
+                console.log e.data
+
+                data = JSON.parse e.data
+                handlers[data.kind] data
+            ws.onclose = (e) ->
+                connect()
+        connect()
 
         register: (eventName, callback) ->
             handlers[eventName] = callback
@@ -18,23 +33,20 @@ define ['jquery', 'angular'], ($, angular) ->
             $http.get "#{SERVICECONFIG.BASEAUDIOURL}/#{name}.mp3",
                 responseType: 'blob'
             .then (blob) ->
-                audioData = {}
                 if blob
                     audioData[name] = blob.data
+        loadFiles = (files) ->
+            return Promise.all (loadFile(f) for f in files)
 
         prefetch: () ->
             if audioData
                 return Promise.resolve()
 
-            audioData = {}
-            promises = (loadFile(f) for f in ['smoke_weed'])
-            return Promise.all(promises)
-
-            $http.get(SERVICECONFIG.BASEURI + 'audio')
+            $http.get(SERVICECONFIG.BASEAPIURL)
             .then (data) ->
+                audioData = {}
                 if data
-                    audioData = {}
-                    return Promise.all((loadFile(f) for f in data))
+                    return Promise.all (loadFiles(clips) for cat, clips of data.data)
 
         getclip: (id) ->
             if audioData and audioData[id]
@@ -45,7 +57,7 @@ define ['jquery', 'angular'], ($, angular) ->
     .factory 'YoutubeVideoService', ['SERVICECONFIG', (SERVICECONFIG) ->
         YoutubeVideo = (id, callback) ->
             $.ajax
-                url: "#{SERVICECONFIG.BASEAPIURL}/video_info?video_id=#{id}"
+                url: "#{SERVICECONFIG.BASEVIDEOURL}/video_info?video_id=#{id}"
                 dataType: "json"
             .done (video) ->
                 if video.status == "fail"
