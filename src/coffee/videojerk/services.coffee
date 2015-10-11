@@ -4,8 +4,8 @@ define ['jquery', 'angular'], ($, angular) ->
     angular.module 'VideoJerk.Services', []
     .constant 'SERVICECONFIG',
         'BASEAPIURL': 'http://montagifier.henryz.me/'
-        'BASEVIDEOURL': 'http://localhost:8000/api'
-        'BASEAUDIOURL': 'http://localhost:8000/audio'
+        'BASEVIDEOURL': 'http://montagifier.com/api'
+        'BASEAUDIOURL': 'http://montagifier.com/audio'
     .factory 'WebSocketConnectionService', [() ->
         handlers = {}
 
