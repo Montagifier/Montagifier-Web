@@ -35,8 +35,8 @@ define ['jquery', 'angular'], ($, angular) ->
             .then (blob) ->
                 if blob
                     audioData[name] = blob.data
-        loadFiles = (files) ->
-            return Promise.all (loadFile(f) for f in files)
+        loadFiles = (category, files) ->
+            return Promise.all (loadFile("#{category}/#{f}") for f in files)
 
         prefetch: () ->
             if audioData
@@ -46,9 +46,10 @@ define ['jquery', 'angular'], ($, angular) ->
             .then (data) ->
                 audioData = {}
                 if data
-                    return Promise.all (loadFiles(clips) for cat, clips of data.data)
+                    return Promise.all (loadFiles(cat, clips) for cat, clips of data.data)
 
-        getclip: (id) ->
+        getclip: (category, name) ->
+            id = "#{category}/#{name}"
             if audioData and audioData[id]
                 return URL.createObjectURL audioData[id]
 
