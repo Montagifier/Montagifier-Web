@@ -9,12 +9,15 @@ define ['jquery', 'angular'], ($, angular) ->
         'WebSocketConnectionService',
         'AudioNibbleIndexService',
         ($scope, ws, audioNibbles) ->
-            audioNibbles.prefetch()
-            ws.register 'sound', (data) ->
-                url = audioNibbles.getclip data.category, data.name
+            playSound = (url) ->
                 player = new Audio(url)
                 player.volume = 0.75
                 player.play()
+
+            audioNibbles.prefetch()
+            ws.register 'sound', (data) ->
+                clip = audioNibbles.getclip data.category, data.name
+                Promise.resolve(clip).then playSound
     ]
     .controller 'YoutubeVideoController', [
         '$scope',

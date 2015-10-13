@@ -53,7 +53,8 @@ define ['jquery', 'angular'], ($, angular) ->
             if audioData and audioData[id]
                 return URL.createObjectURL audioData[id]
 
-            return null
+            loadFile(id).then () ->
+                return URL.createObjectURL audioData[id]
     ]
     .factory 'YoutubeVideoService', ['SERVICECONFIG', (SERVICECONFIG) ->
         YoutubeVideo = (id, callback) ->
