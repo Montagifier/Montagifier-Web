@@ -11,7 +11,7 @@ define ['jquery', 'angular'], ($, angular) ->
         ($scope, ws, audioNibbles) ->
             audioNibbles.prefetch()
             ws.register 'sound', (data) ->
-                url = audioNibbles.getclip data.name
+                url = audioNibbles.getclip data.category, data.name
                 player = new Audio(url)
                 player.volume = 0.75
                 player.play()
